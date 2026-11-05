@@ -1,0 +1,28 @@
+{
+  "targets": [
+    {
+      "upstream_repo": "praw-dev/praw",
+      "head_sha": "31734814d064948a131947bf9d743f8a7792ec4f",
+      "file": "praw/util/snake.py",
+      "function": "camel_to_snake",
+      "native_test_cmd": "uv run --frozen pytest tests/unit/util/test_snake.py -q --tb=short",
+      "bench_cmd": "uv run --frozen python osspr-intake/harness/camel_to_snake/bench.py",
+      "baseline_median_ms": 4.1006,
+      "baseline_noise_pct": 1.65,
+      "tests_pass_on_baseline": true,
+      "notes": "Every modmail payload runs this lookahead regex once per key. A recorded conversations listing has about 7000 keys and only about 200 distinct ones, and snake_case_keys calls camel_to_snake on each of them. A small cache or a straight character scan should replace the per-key regex; a local cache prototype was about 14x faster on that listing."
+    },
+    {
+      "upstream_repo": "praw-dev/praw",
+      "head_sha": "31734814d064948a131947bf9d743f8a7792ec4f",
+      "file": "praw/models/comment_forest.py",
+      "function": "CommentForest._gather_more_comments",
+      "native_test_cmd": "uv run --frozen pytest tests/integration/models/test_comment_forest.py::TestCommentForest::test_replace__skip_all tests/integration/models/test_comment_forest.py::TestCommentForest::test_replace__skip_at_limit tests/integration/models/test_comment_forest.py::TestCommentForest::test_replace__skip_below_threshold tests/integration/models/test_comment_forest.py::TestCommentForest::test_replace__on_comment_from_submission -q --tb=short",
+      "bench_cmd": "uv run --frozen python osspr-intake/harness/gather_more_comments/bench.py",
+      "baseline_median_ms": 1.1891,
+      "baseline_noise_pct": 1.99,
+      "tests_pass_on_baseline": true,
+      "notes": "replace_more starts by walking the whole comment tree with list.pop(0) and by iterating each CommentForest through __getitem__ (IndexError protocol). The bench builds ~2000 nodes from the recorded 3hahrw thread, a size the suite already fully expands. A deque plus walking the child list directly was about 6x faster in a local prototype."
+    }
+  ]
+}
